@@ -1,0 +1,317 @@
+import { useNavigation, useRoute } from '@react-navigation/native'
+import { getAssetByName, getAssetIdByName } from '@retribution-mod/assets'
+import { styles } from '@retribution-mod/components/_'
+import Page from '@retribution-mod/components/Page'
+import SearchInput from '@retribution-mod/components/SearchInput'
+import { ActionSheetActionCreators } from '@retribution-mod/discord/actions'
+import { Tokens } from '@retribution-mod/discord/common/tokens'
+import { Design } from '@retribution-mod/discord/design'
+import { reloadApp } from '@retribution-mod/modules/native/app'
+import {
+    getInternalPluginMeta,
+    isDefaultsOnlyBoot,
+    isPluginEnabled,
+    isPluginEssential,
+    isPluginInternal,
+    isPluginPendingReload,
+    isPluginPendingUpdate,
+    pEmitter,
+    pList,
+} from '@retribution-mod/plugins/_'
+import { debounce } from '@retribution-mod/utils/callback'
+import {
+    useCallback,
+    useEffect,
+    useLayoutEffect,
+    useMemo,
+    useState,
+} from 'react'
+import { Image, View } from 'react-native'
+import RetributionIcon from '~assets/RetributionIcon'
+import { InstalledPluginMasonryFlashList } from '../components/PluginList'
+import PluginStatesProvider from '../components/PluginStateProvider'
+import PluginTooltipsProvider from '../components/TooltipProvider'
+import { RouteNames, Setting } from '../constants'
+import type { NavigationProp, RouteProp } from '@react-navigation/core'
+import type { ReactNavigationParamList } from '@retribution-mod/externals/react-navigation'
+import type { FilterAndSortActionSheetProps } from '../components/FilterAndSortActionSheet'
+
+const { Stack, IconButton, FloatingActionButton, LayerScope, Card, Text } =
+    Design
+
+const FiltersHorizontalIcon = getAssetIdByName('FiltersHorizontalIcon', 'png')!
+const SettingsIcon = getAssetIdByName('SettingsIcon')!
+const PlusLargeIcon = getAssetIdByName('PlusLargeIcon')!
+
+export default function RetributionPluginsSettingScreen() {
+    return (
+        <LayerScope>
+            <PluginStatesProvider>
+                <PluginTooltipsProvider>
+                    <Page spacing={16}>
+                        <Screen />
+                    </Page>
+                </PluginTooltipsProvider>
+            </PluginStatesProvider>
+        </LayerScope>
+    )
+}
+
+const SearchDebounceTime = 100
+
+const Filters: FilterAndSortActionSheetProps['filters'] = {
+    Enabled: {
+        icon: getAssetIdByName('CircleCheckIcon')!,
+        filter: plugin => isPluginEnabled(plugin),
+    },
+    Disabled: {
+        icon: getAssetIdByName('CircleXIcon')!,
+        filter: plugin => !isPluginEnabled(plugin),
+    },
+    'Has Errors': {
+        icon: getAssetIdByName('CircleErrorIcon')!,
+        filter: plugin => plugin.errors.length > 0,
+    },
+    'Pending Reload': {
+        icon: getAssetIdByName('RetryIcon')!,
+        filter: plugin => isPluginPendingReload(plugin),
+    },
+    'Pending Update': {
+        icon: getAssetIdByName('RefreshIcon')!,
+        filter: plugin => isPluginPendingUpdate(plugin),
+    },
+    Configurable: {
+        icon: getAssetIdByName('SettingsIcon')!,
+        desc: 'Can be toggled or have settings that can be configured.',
+        filter: (plugin, meta) =>
+            !isPluginEssential(meta) || plugin.SettingsComponent !== undefined,
+    },
+    Internal: {
+        icon: RetributionIcon,
+        desc: 'Included with Retribution.',
+        filter: (_, meta) => isPluginInternal(meta),
+    },
+} satisfies FilterAndSortActionSheetProps['filters']
+const DefaultFilters: FilterAndSortActionSheetProps['filter'] = ['Configurable']
+
+const DefaultSort: keyof typeof Sorts = 'Name'
+const Sorts = {
+    Name: [
+        getAssetIdByName('IdIcon')!,
+        (a, b) => a.manifest.name.localeCompare(b.manifest.name),
+    ],
+    'Enabled first': [
+        getAssetIdByName('CircleCheckIcon')!,
+        (a, b) =>
+            isPluginEnabled(a) === isPluginEnabled(b)
+                ? a.manifest.name.localeCompare(b.manifest.name)
+                : isPluginEnabled(a)
+                  ? -1
+                  : 1,
+    ],
+} satisfies FilterAndSortActionSheetProps['sorts']
+
+function HeaderButton() {
+    const navigation = useNavigation<NavigationProp<any>>()
+
+    return (
+        <IconButton
+            icon={SettingsIcon}
+            onPress={() =>
+                navigation.navigate(RouteNames[Setting.RetributionPluginsAdvanced])
+            }
+            variant="tertiary"
+        />
+    )
+}
+
+function BrowseFloatingActionButton({ disabled }: { disabled?: boolean }) {
+    const navigation = useNavigation<NavigationProp<any>>()
+
+    return (
+        <FloatingActionButton
+            disabled={disabled}
+            icon={PlusLargeIcon}
+            accessibilityLabel="Browse plugins"
+            onPress={() =>
+                navigation.navigate(RouteNames[Setting.RetributionPluginsBrowse])
+            }
+        />
+    )
+}
+
+const ShieldIcon = getAssetByName('ShieldIcon')!
+const RecoveryBannerTitleVariant = 'text-md/semibold'
+
+const useRecoveryBannerStyles = Design.createStyles({
+    icon: {
+        tintColor: Tokens.default.colors.TEXT_DEFAULT,
+        height: Design.TextStyleSheet[RecoveryBannerTitleVariant].lineHeight,
+        width: undefined,
+        aspectRatio: (ShieldIcon.width ?? 1) / (ShieldIcon.height ?? 1),
+    },
+})
+
+function RecoveryModeBanner() {
+    const styles = useRecoveryBannerStyles()
+
+    return (
+        <Card style={{ marginHorizontal: 6, marginVertical: 6, boxShadow: '' }}>
+            <Stack spacing={12}>
+                <Stack direction="horizontal" spacing={8} align="center">
+                    <Image
+                        source={ShieldIcon.id}
+                        resizeMode="contain"
+                        style={styles.icon}
+                    />
+                    <Text variant={RecoveryBannerTitleVariant}>
+                        Recovery Mode
+                    </Text>
+                </Stack>
+                <Text variant="text-sm/medium">
+                    You are now running with default plugins. Additional plugins
+                    can't be started in Recovery Mode.{'\n\n'}
+                    Disable or uninstall plugins that might be causing issues,
+                    then reload the app to exit Recovery Mode.
+                </Text>
+                <Stack spacing={8}>
+                    <Design.Button
+                        icon={getAssetIdByName('RetryIcon')}
+                        size="sm"
+                        text="Exit Recovery Mode"
+                        onPress={() => {
+                            reloadApp()
+                        }}
+                    />
+                </Stack>
+            </Stack>
+        </Card>
+    )
+}
+
+function snapshotPlugins() {
+    return [...pList.values()].map(
+        plugin => [plugin, getInternalPluginMeta(plugin)] as const,
+    )
+}
+
+function Screen() {
+    const navigation = useNavigation()
+    const route =
+        useRoute<
+            RouteProp<
+                ReactNavigationParamList,
+                (typeof RouteNames)[typeof Setting.RetributionPlugins]
+            >
+        >()
+
+    const [search, setSearch] = useState('')
+    const debouncedSetSearch = useCallback(
+        debounce(setSearch, SearchDebounceTime),
+        [],
+    )
+
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerRight: () => <HeaderButton />,
+        })
+    }, [navigation])
+
+    const filter = route.params?.filter ?? DefaultFilters
+    const matchAll = route.params?.matchAll ?? true
+    const reverse = route.params?.reverse ?? false
+    const sort = route.params?.sort ?? DefaultSort
+
+    const hasFilter = useMemo(
+        () =>
+            filter.some(f => !DefaultFilters.includes(f)) ||
+            matchAll !== true ||
+            reverse !== false ||
+            sort !== DefaultSort,
+        [filter, matchAll, reverse, sort],
+    )
+
+    const [allPlugins, setAllPlugins] = useState(snapshotPlugins)
+
+    useEffect(() => {
+        const handleUpdate = () => setAllPlugins(snapshotPlugins())
+
+        pEmitter.on('register', handleUpdate)
+        pEmitter.on('unregister', handleUpdate)
+
+        return () => {
+            pEmitter.off('register', handleUpdate)
+            pEmitter.off('unregister', handleUpdate)
+        }
+    }, [])
+
+    const plugins = useMemo(
+        () =>
+            allPlugins
+                .filter(([plugin, meta]) => {
+                    if (filter.length === 0) return true
+                    if (matchAll)
+                        return filter.every(f =>
+                            Filters[f].filter(plugin, meta),
+                        )
+
+                    return filter.some(f => Filters[f].filter(plugin, meta))
+                })
+                .filter(([plugin]) => {
+                    const { name, description, author } = plugin.manifest
+                    const query = search.toLowerCase()
+                    return (
+                        name.toLowerCase().includes(query) ||
+                        description.toLowerCase().includes(query) ||
+                        author.toLowerCase().includes(query)
+                    )
+                })
+                .sort(([a], [b]) => {
+                    const result = Sorts[sort as keyof typeof Sorts][1](a, b)
+                    return reverse ? -result : result
+                }),
+        [allPlugins, filter, matchAll, reverse, sort, search],
+    )
+
+    return (
+        <>
+            <Stack direction="horizontal">
+                <View style={styles.grow}>
+                    <SearchInput onChange={debouncedSetSearch} size="md" />
+                </View>
+                <IconButton
+                    icon={FiltersHorizontalIcon}
+                    variant={hasFilter ? 'primary' : 'tertiary'}
+                    onPress={() =>
+                        ActionSheetActionCreators.openLazy(
+                            import('../components/FilterAndSortActionSheet'),
+                            'filter-and-sort-plugins',
+                            {
+                                filters: Filters,
+                                filter,
+                                setFilter: filter =>
+                                    navigation.setParams({ filter }),
+                                matchAll,
+                                setMatchAll: matchAll =>
+                                    navigation.setParams({ matchAll }),
+                                reverse,
+                                setReverse: reverse =>
+                                    navigation.setParams({ reverse }),
+                                sorts: Sorts,
+                                sort,
+                                setSort: sort => navigation.setParams({ sort }),
+                            },
+                        )
+                    }
+                />
+            </Stack>
+            <InstalledPluginMasonryFlashList
+                ListHeaderComponent={
+                    isDefaultsOnlyBoot ? RecoveryModeBanner : null
+                }
+                plugins={plugins}
+            />
+            <BrowseFloatingActionButton disabled={isDefaultsOnlyBoot} />
+        </>
+    )
+}

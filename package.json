@@ -1,0 +1,73 @@
+{
+  "name": "@retribution-mod/Retribution",
+  "version": "0.1.0",
+  "module": "src/index.ts",
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.5",
+    "@parcel/watcher": "^2.6.0",
+    "@react-native-clipboard/clipboard": "^1.16.3",
+    "dotenv": "^17.4.2",
+    "react-native-gesture-handler": "^3.2.1",
+    "react-native-reanimated": "^4.5.3",
+    "react-native-safe-area-context": "^5.8.0",
+    "rolldown-plugin-dts": "^0.27.14",
+    "@react-navigation/core": "^7.14.0",
+    "@react-navigation/native": "^7.1.28",
+    "@react-navigation/stack": "^7.7.2",
+    "@shopify/flash-list": "2.3.2",
+    "@types/node": "^25.9.2",
+    "@types/react": "^19.2.17",
+    "buffer": "^6.0.3",
+    "react": "19.2.3",
+    "react-native": "0.86.0",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
+  },
+  "private": true,
+  "scripts": {
+    "build": "deno run --permission-set=build scripts/build.ts",
+    "dev": "deno run --permission-set=build scripts/dev.ts",
+    "types": "deno run --permission-set=types scripts/types.ts",
+    "test": "vitest run"
+  },
+  "trustedDependencies": [
+    "@biomejs/biome",
+    "@parcel/watcher",
+    "@swc/core"
+  ],
+  "type": "module",
+  "workspaces": [
+    "lib/*",
+    "plugins/*"
+  ],
+  "dependencies": {
+    "@retribution-mod/assets": "workspace:*",
+    "@retribution-mod/components": "workspace:*",
+    "@retribution-mod/discord": "workspace:*",
+    "@retribution-mod/externals": "workspace:*",
+    "@retribution-mod/hidden": "workspace:*",
+    "@retribution-mod/json-storage": "workspace:*",
+    "@retribution-mod/modules": "workspace:*",
+    "@retribution-mod/patcher": "workspace:*",
+    "@retribution-mod/plugins": "workspace:*",
+    "@retribution-mod/react": "workspace:*",
+    "@retribution-mod/utils": "workspace:*",
+    "@swc/core": "^1.15.43",
+    "chalk": "^6.0.0",
+    "hermes-compiler": "250829098.0.15",
+    "magic-string": "^1.1.0",
+    "react-native-click-outside": "^0.1.1",
+    "rolldown": "1.2.1"
+  },
+  "overrides": {
+    "@react-native/community-cli-plugin": "npm:dry-uninstall",
+    "@react-native/codegen": "npm:dry-uninstall",
+    "babel-jest": "npm:dry-uninstall",
+    "babel-plugin-syntax-hermes-parser": "npm:dry-uninstall",
+    "jsc-android": "npm:dry-uninstall",
+    "react-devtools-core": "npm:dry-uninstall",
+    "recyclerlistview": "npm:dry-uninstall",
+    "react-native-gesture-handler": "npm:dry-uninstall",
+    "react-native-screens": "npm:dry-uninstall"
+  }
+}
