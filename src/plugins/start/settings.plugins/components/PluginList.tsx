@@ -2,7 +2,7 @@ import { styles } from '@retribution-mod/components/_'
 import { Design } from '@retribution-mod/discord/design'
 import { formatVersion } from '@retribution-mod/plugins/utils'
 import { FlashList } from '@shopify/flash-list'
-import { useWindowDimensions } from 'react-native'
+import { useWindowDimensions, View } from 'react-native'
 import {
     BrowsePluginCard,
     InstalledPluginCard,
@@ -84,9 +84,11 @@ export function InstalledPluginMasonryFlashList({
 
 function NoPlugins() {
     return (
-        <Text variant="heading-md/medium" style={{ textAlign: 'center' }}>
-            No plugins found. Try changing your query or filters.
-        </Text>
+        <View style={{ padding: 16 }}>
+            <Text variant="heading-md/medium" style={{ textAlign: 'center' }}>
+                No plugins found. Try changing your query or filters.
+            </Text>
+        </View>
     )
 }
 
@@ -163,8 +165,10 @@ export function BrowsePluginMasonryFlashList({
 
 function NoBrowsePlugins() {
     return (
-        <Text variant="heading-md/medium" style={{ textAlign: 'center' }}>
-            No plugins available. Add repositories to browse plugins.
-        </Text>
+        <View style={{ padding: 16 }}>
+            <Text variant="heading-md/medium" style={{ textAlign: 'center' }}>
+                No plugins available. Add repositories to browse plugins.
+            </Text>
+        </View>
     )
 }
