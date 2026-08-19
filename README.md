@@ -52,7 +52,7 @@ These are the official Retribution ways to install Retribution:
 - **🍎 iOS (jailbreak / TrollStore)**: [retribution-tweak](https://github.com/Retribution-Mod/retribution-tweak/releases/latest)
 - **🍎 iOS (sideload)**: install the IPA with [SideStore](https://sidestore.io) or [AltStore](https://altstore.io)
 
-Using the installation methods above will currently install [Retribution Classic](https://github.com/Retribution-Mod/Retribution). You'll need to update from Retribution Classic to Retribution Next manually.
+Using the installation methods above will currently install [Retribution Classic](https://github.com/Retribution-Mod/retribution-bundle). You'll need to update from Retribution Classic to Retribution Next manually.
 
 ### ⬆️ Updating to Retribution Next
 
