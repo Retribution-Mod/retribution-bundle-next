@@ -11,7 +11,7 @@
     >
   </picture>
   <br>
-   <a href="https://discord.com/invite/ddcQf3s2Uq">
+   <a href="https://discord.gg/7CWcwZZGWr">
        <picture>
            <source height="32px" media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/13122796/178032563-d4e084b7-244e-4358-af50-26bde6dd4996.png" />
            <img height="32px" src="https://user-images.githubusercontent.com/13122796/178032563-d4e084b7-244e-4358-af50-26bde6dd4996.png" />
@@ -28,9 +28,9 @@
 
 # Retribution
 
-**Discord, your way.** Retribution is a client modification for Discord Android.
+**Discord, your way.** Retribution is a client modification for Discord on Android and iOS.
 
-Retribution aims to be a lightweight and lightning-fast client modification for Discord Android, while being user-friendly and developer-first. It provides a powerful framework, allowing developers to make add-ons with ease. The sky is the limit!
+Retribution aims to be a lightweight and lightning-fast client modification, while being user-friendly and developer-first. It provides a powerful framework, allowing developers to make add-ons with ease. The sky is the limit!
 
 ## ❓ About
 
@@ -38,16 +38,19 @@ This repository releases Hermes Bytecode to be executed on official Discord Andr
 
 ## 💪 Features
 
-- **🔌 Plugins**: Extend Discord with custom features
-- **🎨 Themes & Fonts**: Customize Discord's appearance to your liking
+- **🔌 Plugins**: Extend Discord with custom features — https://plugins-list.pages.dev or the [Plugin List plugin](https://purple-eyez.github.io/Plugins-List_Plugin/plugins-list/)
+- **🎨 Themes**: Customize Discord's appearance — themes are available in the Plugin List
+- **✏️ Fonts**: Find and apply fonts at https://bunny-google-fonts.vercel.app/
 - **🧪 Experiments**: Try out Discord's new features before they're rolled out
 
 ## ⬇️ Download
 
 These are the official Retribution ways to install Retribution:
 
-- **📵 Non-root**: [Retribution Manager](https://github.com/Retribution-Mod/retribution-manager/releases/latest)
-- **🩹 Root with Xposed**: [RetributionXposed](https://github.com/Retribution-Mod/retribution-xposed/releases/latest)
+- **📵 Android (no root)**: [Retribution Manager](https://github.com/Retribution-Mod/retribution-manager/releases/latest)
+- **🩹 Android (root/LSPosed)**: [RetributionXposed](https://github.com/Retribution-Mod/retribution-xposed/releases/latest)
+- **🍎 iOS (jailbreak / TrollStore)**: [retribution-tweak](https://github.com/Retribution-Mod/retribution-tweak/releases/latest)
+- **🍎 iOS (sideload)**: install the IPA with [SideStore](https://sidestore.io) or [AltStore](https://altstore.io)
 
 Using the installation methods above will currently install [Retribution Classic](https://github.com/Retribution-Mod/Retribution). You'll need to update from Retribution Classic to Retribution Next manually.
 
