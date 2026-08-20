@@ -2,6 +2,17 @@ name: Build
 
 on:
   workflow_dispatch:
+    inputs:
+      release:
+        description: Publish the production bundle
+        required: true
+        default: false
+        type: boolean
+      version:
+        description: Release version
+        required: false
+        default: 0.1.1
+        type: string
   push:
     branches:
       - dev
@@ -10,6 +21,9 @@ on:
     branches:
       - dev
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build
@@ -17,7 +31,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-              
+
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
@@ -29,15 +43,15 @@ jobs:
       - name: Build development bundle
         run: deno run build --dev
         env:
-          Retribution_DISCORD_SERVER_URL: ${{ vars.Retribution_DISCORD_SERVER_URL }}
-          Retribution_SOURCE_REPOSITORY_URL: ${{ vars.Retribution_SOURCE_REPOSITORY_URL }}
-          Retribution_LICENSE_URL: ${{ vars.Retribution_LICENSE_URL }}
+          Retribution_DISCORD_SERVER_URL: ${{ vars.Retribution_DISCORD_SERVER_URL || 'https://discord.com/invite/7CWcwZZGWr' }}
+          Retribution_SOURCE_REPOSITORY_URL: ${{ vars.Retribution_SOURCE_REPOSITORY_URL || 'https://github.com/Retribution-Mod/retribution-bundle-next' }}
+          Retribution_LICENSE_URL: ${{ vars.Retribution_LICENSE_URL || 'https://raw.githubusercontent.com/Retribution-Mod/retribution-bundle-next/main/LICENSE' }}
 
       - name: Upload development bundle
         uses: actions/upload-artifact@v4
         with:
           name: Retribution-bundle-development
-          path: dist/Retribution.bundle
+          path: dist/Retribution.js
           if-no-files-found: error
 
       - name: Clear build
@@ -46,13 +60,25 @@ jobs:
       - name: Build production bundle
         run: deno run build
         env:
-          Retribution_DISCORD_SERVER_URL: ${{ vars.Retribution_DISCORD_SERVER_URL }}
-          Retribution_SOURCE_REPOSITORY_URL: ${{ vars.Retribution_SOURCE_REPOSITORY_URL }}
-          Retribution_LICENSE_URL: ${{ vars.Retribution_LICENSE_URL }}
+          Retribution_DISCORD_SERVER_URL: ${{ vars.Retribution_DISCORD_SERVER_URL || 'https://discord.com/invite/7CWcwZZGWr' }}
+          Retribution_SOURCE_REPOSITORY_URL: ${{ vars.Retribution_SOURCE_REPOSITORY_URL || 'https://github.com/Retribution-Mod/retribution-bundle-next' }}
+          Retribution_LICENSE_URL: ${{ vars.Retribution_LICENSE_URL || 'https://raw.githubusercontent.com/Retribution-Mod/retribution-bundle-next/main/LICENSE' }}
+
+      - name: Prepare production asset
+        run: cp dist/Retribution.js dist/retribution.min.js
 
       - name: Upload production bundle
         uses: actions/upload-artifact@v4
         with:
           name: Retribution-bundle
-          path: dist/Retribution.bundle
+          path: dist/retribution.min.js
           if-no-files-found: error
+
+      - name: Create GitHub release
+        if: github.event_name == 'workflow_dispatch' && inputs.release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ inputs.version }}
+          name: Retribution Next v${{ inputs.version }}
+          files: dist/retribution.min.js
+          generate_release_notes: true
