@@ -16,8 +16,13 @@ import type { AnyObject, DeepPartial, If } from '@retribution-mod/utils/types'
  * @param id The plugin ID.
  * @param file The file name (or relative path) of the storage document inside the plugin's storage directory.
  */
-export const pluginStoragePathFor = (id: string, file = 'storage.json') =>
-    `${pluginStorageDirFor(id)}/${file}`
+export const pluginStoragePathFor = (id: string, file = 'storage.json') => {
+    file = file.replace(/\\/g, '/')
+    if (file.startsWith('/') || file.split('/').some(s => s === '..'))
+        throw new Error('Invalid storage file')
+
+    return `${pluginStorageDirFor(id)}/${file}`
+}
 
 export type JsonStorageSubscription<T extends AnyObject = AnyObject> = (
     update: DeepPartial<T>,
@@ -40,13 +45,29 @@ export const JsonStorageUpdateMode = {
     Load: 2,
 } as const
 
+const resolveStoragePath = (base: string, path: string) => {
+    path = path.replace(/\\/g, '/')
+    base = base.replace(/\\/g, '/').replace(/\/+$/, '')
+
+    if (path.startsWith('/')) {
+        if (path !== base && !path.startsWith(`${base}/`))
+            throw new Error('Invalid storage path')
+        path = path === base ? '' : path.slice(base.length + 1)
+    }
+
+    const segments = path.split('/').filter(s => s && s !== '.')
+    if (segments.some(s => s === '..')) throw new Error('Invalid storage path')
+
+    return `${base}/${segments.join('/')}`
+}
+
 /**
  * Create a new JSON storage object.
  *
  * @param path The path to the storage document.
  * - Relative paths resolve against the app data directory (`/data/data/<pkg>` on Android).
  *   Use `files/...` for app data or `cache/...` for cache on Android.
- * - Absolute paths are used as-is.
+ * - Absolute paths must be within the app data directory; `..` is not allowed.
  *
  * @param options Options for the storage.
  */
@@ -55,9 +76,7 @@ export function JsonStorage<T extends AnyObject>(
     path: string,
     options?: JsonStorageOptions<T>,
 ) {
-    const fullPath = path.startsWith('/')
-        ? path
-        : `${getConstants().data}/${path}`
+    const fullPath = resolveStoragePath(getConstants().data, path)
 
     const subscriptions = new Set<JsonStorageSubscription<T>>()
 
@@ -144,7 +163,7 @@ JsonStorage.prototype.use = () => {
  * @param path The path to the storage document.
  * - Relative paths resolve against the app data directory (`/data/data/<pkg>` on Android).
  *   Use `files/...` for app data or `cache/...` for cache on Android.
- * - Absolute paths are used as-is.
+ * - Absolute paths must be within the app data directory; `..` is not allowed.
  */
 export function getJsonStorage<T extends AnyObject = AnyObject>(
     path: string,

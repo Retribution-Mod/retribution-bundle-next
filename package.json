@@ -68,6 +68,7 @@
     "react-devtools-core": "npm:dry-uninstall",
     "recyclerlistview": "npm:dry-uninstall",
     "react-native-gesture-handler": "npm:dry-uninstall",
-    "react-native-screens": "npm:dry-uninstall"
+    "react-native-screens": "npm:dry-uninstall",
+    "image-size": "2.0.2"
   }
 }

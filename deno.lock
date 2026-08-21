@@ -1791,11 +1791,8 @@
     "ieee754@1.2.1": {
       "integrity": "sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA=="
     },
-    "image-size@1.2.1": {
-      "integrity": "sha512-rH+46sQJ2dlwfjfhCyNx5thzrv+dtmBIhPHk0zgRUukHzZ/kRueTJXoYYsclBaKcSMBWuGbOFXtioLpzTb5euw==",
-      "dependencies": [
-        "queue"
-      ],
+    "image-size@2.0.2": {
+      "integrity": "sha512-IRqXKlaXwgSMAMtpNzZa1ZAe8m+Sa1770Dhk8VkSsP9LS+iHD62Zd8FQKs8fbPiagBE7BzoFX23cxFnwshpV6w==",
       "bin": true
     },
     "inherits@2.0.4": {
@@ -2322,12 +2319,7 @@
         "strict-uri-encode"
       ]
     },
-    "queue@6.0.2": {
-      "integrity": "sha512-iHZWu+q3IdFZFX36ro/lKBkSvfkztY5Y7HMiPlOUjhupPcG2JMfst2KKEpu5XndviX/3UhFbRngUPNKtgvtZiA==",
-      "dependencies": [
-        "inherits"
-      ]
-    },
+
     "react-freeze@1.0.4_react@19.2.3": {
       "integrity": "sha512-r4F0Sec0BLxWicc7HEyo2x3/2icUTrRmDjaaRyzzn+7aDyFZliszMDOgLVwSnQnYENOlL1o569Ze2HZefk8clA==",
       "dependencies": [
@@ -2954,7 +2946,8 @@
         "react-devtools-core": "npm:dry-uninstall",
         "recyclerlistview": "npm:dry-uninstall",
         "react-native-gesture-handler": "npm:dry-uninstall",
-        "react-native-screens": "npm:dry-uninstall"
+        "react-native-screens": "npm:dry-uninstall",
+        "image-size": "2.0.2"
       }
     }
   }
