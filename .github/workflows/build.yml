@@ -43,7 +43,7 @@ jobs:
       - name: Build development bundle
         run: deno run build --dev
         env:
-          Retribution_DISCORD_SERVER_URL: ${{ vars.Retribution_DISCORD_SERVER_URL || 'https://discord.com/invite/7CWcwZZGWr' }}
+          Retribution_DISCORD_SERVER_URL: ${{ vars.Retribution_DISCORD_SERVER_URL || 'https://discord.com/invite/GNrNbGPhZv' }}
           Retribution_SOURCE_REPOSITORY_URL: ${{ vars.Retribution_SOURCE_REPOSITORY_URL || 'https://github.com/Retribution-Mod/retribution-bundle-next' }}
           Retribution_LICENSE_URL: ${{ vars.Retribution_LICENSE_URL || 'https://raw.githubusercontent.com/Retribution-Mod/retribution-bundle-next/main/LICENSE' }}
 
@@ -60,7 +60,7 @@ jobs:
       - name: Build production bundle
         run: deno run build
         env:
-          Retribution_DISCORD_SERVER_URL: ${{ vars.Retribution_DISCORD_SERVER_URL || 'https://discord.com/invite/7CWcwZZGWr' }}
+          Retribution_DISCORD_SERVER_URL: ${{ vars.Retribution_DISCORD_SERVER_URL || 'https://discord.com/invite/GNrNbGPhZv' }}
           Retribution_SOURCE_REPOSITORY_URL: ${{ vars.Retribution_SOURCE_REPOSITORY_URL || 'https://github.com/Retribution-Mod/retribution-bundle-next' }}
           Retribution_LICENSE_URL: ${{ vars.Retribution_LICENSE_URL || 'https://raw.githubusercontent.com/Retribution-Mod/retribution-bundle-next/main/LICENSE' }}
 
